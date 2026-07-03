@@ -7,12 +7,12 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         body { margin:0; background:#000; color:#00ff41; font-family:'VT323',monospace; height:100vh; overflow:hidden; }
-        .header { background:#111; padding:12px 20px; display:flex; justify-content:space-between; border-bottom:3px solid #00ff41; font-size:1.35em; }
-        #terminal { height:calc(100vh - 60px); padding:20px; overflow-y:auto; font-size:1.45em; line-height:1.45; scrollbar-color:#00ff41 #222; }
-        .line { display:flex; margin-bottom:8px; }
-        .prompt { color:#00cc33; margin-right:10px; white-space:pre; }
+        .header { background:#111; padding:12px 20px; display:flex; justify-content:space-between; border-bottom:3px solid #00ff41; }
+        #terminal { height:calc(100vh - 60px); padding:20px; overflow-y:auto; font-size:1.4em; line-height:1.4; }
+        .line { display:flex; margin-bottom:6px; }
+        .prompt { color:#00cc33; margin-right:10px; }
         #input { background:transparent; border:none; color:#00ff41; font:inherit; outline:none; flex:1; }
-        .success { color:#00ffaa; } .error { color:#ff6666; }
+        .success { color:#00ffaa; }
     </style>
 </head>
 <body>
@@ -35,75 +35,46 @@
             term.scrollTop = term.scrollHeight;
         }
         
-        function updateBalance(gain) {
+        function updateBalance() {
+            const gain = Math.floor(Math.random() * 140) + 60;
             balance += gain;
             balEl.textContent = balance;
         }
         
         function longExploit() {
-            print("[+] Initializing Advanced Exploit Chain...", "success");
-            const steps = [
-                "[+] OSINT Phase - Harvesting data",
-                "[+] Passive Recon - DNS & Subdomains",
-                "[+] Active Scanning - Nmap fingerprint",
-                "[+] Vulnerability Analysis - 38 vectors",
-                "[+] CVE Matching & Exploit Generation",
-                "[+] Bypassing WAF & IDS",
-                "[+] Privilege Escalation",
-                "[+] Lateral Movement",
-                "[+] Payload Delivery",
-                "[+] Root Access Gained",
-                "[+] Exfiltrating Data",
-                "[+] Wallet Injection Vector",
-                "[+] Cleaning Logs"
-            ];
+            print("[+] Starting FULL EXPLOIT CHAIN (50 stages)...", "success");
+            
+            const stages = [];
+            for (let i = 1; i <= 50; i++) {
+                stages.push(`[+] Stage ${i}/50: ${['Recon', 'Scanning', 'Bypass', 'Injection', 'Escalation'][Math.floor(Math.random()*5)]} in progress...`);
+            }
             
             let i = 0;
             const interval = setInterval(() => {
-                if (i < steps.length) {
-                    print(steps[i]);
-                    if (Math.random() > 0.4) updateBalance(Math.floor(Math.random() * 220) + 90);
+                if (i < stages.length) {
+                    print(stages[i]);
+                    if (i % 3 === 0) updateBalance();
                     i++;
                 } else {
                     clearInterval(interval);
-                    print("[+] FULL OPERATION COMPLETE - Target Owned", "success");
+                    print("✅ ALL 50 STAGES COMPLETE - FULL COMPROMISE ACHIEVED", "success");
                 }
-            }, 8500); // ~2 minutes total
+            }, 2400); // Adjust speed if needed
         }
         
         function execute(cmd) {
             print(`root@stratcom:~# ${cmd}`);
             const lower = cmd.toLowerCase().trim();
             
-            if (lower === 'help') {
-                print("nmap, hydra, msfconsole, exploit, 1, withdraw, balance, clear", "success");
-            } else if (lower.includes('nmap')) {
-                print("22/tcp open ssh\n80/tcp open http\n443/tcp open https", "success");
-            } else if (lower.includes('hydra')) {
-                print("[+] Hydra running... Password cracked: admin2026!", "success");
-            } else if (lower.includes('msfconsole')) {
-                print("[+] Meterpreter session opened", "success");
-            } else if (lower === 'exploit' || lower === '1') {
-                longExploit();
-            } else if (lower === 'withdraw') {
-                const amt = prompt("Enter amount to withdraw:");
-                if (amt && parseInt(amt) <= balance) {
-                    balance -= parseInt(amt);
-                    balEl.textContent = balance;
-                    print(`[+] $${amt} withdrawn successfully`, "success");
-                }
-            } else if (lower === 'balance') {
-                print(`Current: $${balance}`);
-            } else if (lower === 'clear') {
-                term.innerHTML = '';
-            } else {
-                print("Command executed.", "output");
-            }
+            if (lower === 'help') print("help, exploit, 1, nmap, hydra, balance, clear", "success");
+            else if (lower === 'exploit' || lower === '1') longExploit();
+            else if (lower === 'balance') print(`Balance: $${balance}`);
+            else if (lower === 'clear') term.innerHTML = '';
+            else print("Command executed.", "output");
         }
         
-        // Init
-        print("=== STRATCOM KALI TERMINAL ===", "success");
-        print("Type 'help' for commands");
+        print("KALI LINUX 2026.2 - ADVANCED TUNNEL", "success");
+        print("Type 'exploit' or '1' for 50-stage payload");
         print("");
         
         function addInput() {
