@@ -3,193 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KALI • root@stratcom</title>
+    <title>root@stratcom — KALI 2026</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        
-        body {
-            margin: 0;
-            background: #0a0a0a;
-            color: #00ff41;
-            font-family: 'VT323', monospace;
-            overflow: hidden;
-            height: 100vh;
-        }
-        
-        .header {
-            background: #111;
-            padding: 10px 20px;
-            border-bottom: 3px solid #00ff41;
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.4em;
-            user-select: none;
-        }
-        
-        .tabs {
-            display: flex;
-            background: #1a1a1a;
-            border-bottom: 2px solid #00ff41;
-        }
-        
-        .tab {
-            padding: 12px 25px;
-            cursor: pointer;
-            border-right: 1px solid #00ff41;
-        }
-        
-        .tab.active {
-            background: #00ff41;
-            color: #000;
-        }
-        
-        #terminal {
-            height: calc(100vh - 110px);
-            padding: 20px;
-            overflow-y: auto;
-            font-size: 1.5em;
-            line-height: 1.45;
-        }
-        
-        .line {
-            display: flex;
-            margin-bottom: 8px;
-        }
-        
-        .prompt {
-            color: #00cc33;
-            margin-right: 10px;
-        }
-        
-        #input {
-            background: transparent;
-            border: none;
-            color: #00ff41;
-            font: inherit;
-            outline: none;
-            flex: 1;
-        }
-        
-        .output { color: #bbffbb; }
-        .error { color: #ff6666; }
-        .success { color: #00ffaa; }
-        
-        .blink { animation: blink 0.8s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        body { margin:0; background:#000; color:#00ff41; font-family:'VT323',monospace; height:100vh; overflow:hidden; }
+        .header { background:#111; padding:12px 20px; display:flex; justify-content:space-between; border-bottom:3px solid #00ff41; }
+        #terminal { height:calc(100vh - 60px); padding:20px; overflow-y:auto; font-size:1.5em; line-height:1.4; }
+        .prompt { color:#00cc33; }
+        .line { display:flex; margin-bottom:8px; }
+        #input { background:transparent; border:none; color:#00ff41; font:inherit; outline:none; flex:1; }
+        .success { color:#00ffaa; } .error { color:#ff5555; }
     </style>
 </head>
 <body>
     <div class="header">
         <div>root@stratcom — KALI LINUX 2026.2</div>
-        <div>● TUNNEL ACTIVE</div>
+        <div>💼 $<span id="balance">2450</span> | <span onclick="withdraw()" style="cursor:pointer;color:#ffaa00">WITHDRAW</span></div>
     </div>
-    
-    <div class="tabs">
-        <div class="tab active" onclick="switchTab(0)">TERMINAL</div>
-        <div class="tab" onclick="switchTab(1)">TOOLS</div>
-        <div class="tab" onclick="switchTab(2)">RECON</div>
-    </div>
-    
     <div id="terminal"></div>
 
     <script>
-        let currentTab = 0;
-        let currentDir = '~';
-        let history = [];
-        let historyIndex = -1;
+        let balance = 2450;
+        const term = document.getElementById('terminal');
+        const balEl = document.getElementById('balance');
         
-        const terminal = document.getElementById('terminal');
-        
-        function print(text, cls = 'output') {
-            const div = document.createElement('div');
-            div.className = cls;
-            div.textContent = text;
-            terminal.appendChild(div);
-            terminal.scrollTop = terminal.scrollHeight;
+        function print(text, cls='output') {
+            const d = document.createElement('div');
+            d.className = cls;
+            d.textContent = text;
+            term.appendChild(d);
+            term.scrollTop = term.scrollHeight;
         }
         
-        function prompt() {
-            const line = document.createElement('div');
-            line.className = 'line';
-            line.innerHTML = `<span class="prompt">root@stratcom:${currentDir}# </span><input id="input" autofocus>`;
-            terminal.appendChild(line);
-            
-            const input = line.querySelector('#input');
-            input.focus();
-            
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') {
-                    const cmd = input.value.trim();
-                    if (cmd) {
-                        history.unshift(cmd);
-                        historyIndex = -1;
-                        executeCommand(cmd);
-                    }
-                    input.remove();
-                    if (currentTab === 0) prompt();
-                }
-            });
+        function updateBalance(amt) {
+            balance += amt;
+            balEl.textContent = balance;
         }
         
-        function executeCommand(cmd) {
-            print(`root@stratcom:${currentDir}# ${cmd}`);
-            
-            const args = cmd.toLowerCase().trim().split(' ');
-            const command = args[0];
-            
-            switch(command) {
-                case 'help':
-                    print("ls, cd, cat, nmap, hydra, msfconsole, gobuster, sqlmap, clear, whoami", "success");
-                    break;
-                case 'ls':
-                    print("exploits/  loot/  targets/  tools/");
-                    break;
-                case 'clear':
-                    terminal.innerHTML = '';
-                    break;
-                case 'nmap':
-                    print("[+] Nmap scan started...", "success");
-                    setTimeout(() => print("22/tcp open ssh\n80/tcp open http\n445/tcp open smb"), 900);
-                    break;
-                case 'hydra':
-                    print("[+] Brute force attack launched...", "success");
-                    setTimeout(() => print("[+] Password cracked: P@ssw0rd2026"), 1400);
-                    break;
-                case 'msfconsole':
-                    print("[*] Metasploit Framework v6.4", "success");
-                    setTimeout(() => print("[+] Meterpreter session opened on target"), 1200);
-                    break;
-                case 'whoami':
-                    print("root");
-                    break;
-                default:
-                    print(`Command not found: ${command}. Type 'help'`, "error");
+        function withdraw() {
+            const amount = prompt("Enter withdrawal amount:");
+            if (amount && !isNaN(amount) && amount > 0) {
+                if (amount <= balance) {
+                    print(`[+] Withdrawing $${amount} to wallet...`, "success");
+                    setTimeout(() => {
+                        balance -= parseInt(amount);
+                        balEl.textContent = balance;
+                        print(`[+] Withdrawal successful! New balance: $${balance}`, "success");
+                    }, 1200);
+                } else print("Insufficient funds", "error");
             }
         }
         
-        function switchTab(tab) {
-            currentTab = tab;
-            terminal.innerHTML = '';
-            if (tab === 0) {
-                print("=== KALI TERMINAL ===", "success");
-                prompt();
-            } else if (tab === 1) {
-                print("=== AVAILABLE TOOLS ===", "success");
-                print("1. nmap - Network scanner");
-                print("2. hydra - Brute force");
-                print("3. msfconsole - Exploitation");
+        function runSimulation(cmd) {
+            print(`[+] Executing ${cmd}...`, "success");
+            const steps = ["Scanning...", "Bypassing firewall...", "Injecting payload...", "Establishing connection..."];
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < steps.length) {
+                    print(steps[i]);
+                    updateBalance(Math.floor(Math.random()*120)+50);
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    print("[+] Operation completed successfully.", "success");
+                }
+            }, 700);
+        }
+        
+        function execute(cmd) {
+            print(`root@stratcom:~# ${cmd}`);
+            const lower = cmd.toLowerCase().trim();
+            
+            if (lower === 'help') {
+                print("nmap, hydra, msfconsole, gobuster, exploit, withdraw, balance, clear", "success");
+            } else if (lower.includes('nmap')) {
+                print("PORT   STATE  SERVICE", "success");
+                print("22/tcp  open   ssh");
+                print("80/tcp  open   http");
+            } else if (lower.includes('hydra')) {
+                runSimulation("Hydra Brute Force");
+            } else if (lower.includes('msfconsole') || lower.includes('exploit')) {
+                runSimulation("Metasploit Exploit");
+            } else if (lower.includes('gobuster')) {
+                print("[+] Directory brute force complete", "success");
+                print("/admin, /login, /dashboard");
+            } else if (lower === 'balance') {
+                print(`Current balance: $${balance}`);
+            } else if (lower === 'clear') {
+                term.innerHTML = '';
             } else {
-                print("=== RECON MODULE ===", "success");
-                print("Target: 10.13.37.100");
-                print("Status: Under surveillance");
+                print("Command executed. Use 'help' for full list.", "output");
             }
         }
         
         // Start
-        print("Welcome to Kali Linux 2026.2");
-        print("Type 'help' for commands");
+        print("KALI LINUX 2026.2 | TUNNEL ACTIVE", "success");
+        print("Type 'help' to begin operations.");
         print("");
-        prompt();
+        
+        function addPrompt() {
+            const line = document.createElement('div');
+            line.className = 'line';
+            line.innerHTML = `<span class="prompt">root@stratcom:~# </span><input id="input" autofocus>`;
+            term.appendChild(line);
+            const input = line.querySelector('#input');
+            input.focus();
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    const val = input.value.trim();
+                    if (val) execute(val);
+                    input.value = '';
+                    addPrompt();
+                }
+            });
+        }
+        addPrompt();
     </script>
 </body>
 </html>
